@@ -40,7 +40,7 @@ WgStatus
 
 To run the application, execute the following command:
 ```
-python src/app.py
+python app.py
 ```
 
 The application will start a web server, and you can access the interface by navigating to `http://yourserverip:5000` in your web browser.
