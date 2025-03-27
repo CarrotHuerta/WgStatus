@@ -1,4 +1,4 @@
-# WgStatus Project
+# WgStatus
 
 WgStatus is a Python project that provides real-time updates on the status of WireGuard connections through a web interface. The application is built using Flask and utilizes HTML, CSS, and JavaScript for a responsive user experience.
 
