@@ -6,7 +6,7 @@ WgStatus is a Python project that provides real-time updates on the status of Wi
 
 ```
 WgStatus
-├── src
+├───|
 │   ├── app.py                # Entry point of the application
 │   ├── templates
 │   │   └── index.html        # HTML template for the web interface
