@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WgStatus</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .online {
+            color: green;
+            font-weight: bold;
+        }
+
+        .offline {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* dark mode button */
+        .dark-mode-toggle {
+            cursor: pointer;
+            font-size: 24px;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        .dark-mode-toggle:hover {
+            color: #007bff;
+        }
+
+        /* dark mode */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .container {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode th {
+            background-color: #333;
+        }
+
+        body.dark-mode td {
+            border-bottom: 1px solid #444;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            color: #e0e0e0;
+        }
+    </style>
+    <script>
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                const tableBody = document.getElementById('status-table-body');
+                tableBody.innerHTML = ''; //clear previous data
+
+                if (data.error) {
+                    tableBody.innerHTML = `<tr><td colspan="4">Error: ${data.error}</td></tr>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.ip}</td>
+                        <td>${item.endpoint_ip}</td>
+                        <td>${item.isp}</td>
+                        <td class="${item.online_status ? 'online' : 'offline'}">
+                            ${item.online_status ? 'Online' : 'Offline'}
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error fetching status:', error);
+            }
+        }
+
+        // alternate dark mode
+        function toggleDarkMode() {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+        }
+
+        // apply dark mode or not, maybe
+        function applySavedDarkMode() {
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // refresh data automatically
+        setInterval(fetchStatus, 1000);
+        window.onload = () => {
+            applySavedDarkMode();
+            fetchStatus();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>WireGuard Status</h1>
+            <div class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>IP</th>
+                    <th>Endpoint IP</th>
+                    <th>ISP</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="status-table-body">
+                <tr>
+                    <td colspan="4">Loading...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
